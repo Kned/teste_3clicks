@@ -1,0 +1,35 @@
+version: '3'
+services:
+  db:
+    image: postgres:14.2-alpine
+    container_name: myapp-postgres-14.2
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command: "postgres -c 'max_connections=500'"
+    environment:
+      POSTGRES_DB: teste_3clicks_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    command: "bin/dev"
+    environment:
+      DB_HOST: db
+      DB_NAME: teste_3clicks_dev
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+volumes:
+  postgres_data: {}
+networks:
+  default:
+    name: myapp_default
